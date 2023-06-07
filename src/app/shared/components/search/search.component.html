@@ -1,0 +1,5 @@
+<mat-form-field appearance="outline" class="w-full">
+    <mat-label>{{ label }}</mat-label>
+    <input matInput (keyup)="publishSearchTerm($event)" [placeholder]="placeholder">
+    <mat-icon matSuffix>search</mat-icon>
+</mat-form-field>

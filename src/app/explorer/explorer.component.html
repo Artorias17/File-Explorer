@@ -1,0 +1,20 @@
+<div class="flex flex-col h-full gap-1">
+    <div class="flex-none flex items-center gap-4">
+      <div class="flex-none flex gap-4 mb-4">
+        <button mat-mini-fab (click)="onGoBack()" [disabled]="directoryHistoryIndex === 0">
+          <mat-icon>navigate_before</mat-icon>
+        </button>
+        <button mat-mini-fab (click)="onGoForward()" [disabled]="directoryHistroy.length === directoryHistoryIndex + 1">
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+      </div>
+      <div class="flex-grow my-auto">
+        <h3>{{ currentDirectory }}</h3>
+      </div>
+      <app-search label="Search" class="w-96"></app-search>
+    </div>
+    <mat-divider />
+    <div class="overflow-y-auto flex-grow mt-5">
+      <app-list-view [folders]="folders" [files]="files" (itemClickEvent)="onDoubleClickDir($event)"/>
+    </div>
+  </div>

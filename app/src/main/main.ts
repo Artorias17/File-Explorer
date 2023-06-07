@@ -1,25 +1,24 @@
-import {app, BrowserWindow, screen} from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import { addIpcHandlers } from './ipcHandlers';
 
-let win: BrowserWindow = null;
+let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+  serve = args.some((val) => val === '--serve');
 
 function createWindow(): BrowserWindow {
-
   const size = screen.getPrimaryDisplay().workAreaSize;
 
   // Create the browser window.
   win = new BrowserWindow({
-    x: 0,
-    y: 0,
     width: size.width,
     height: size.height,
     webPreferences: {
-      nodeIntegration: true,
-      allowRunningInsecureContent: (serve),
-      contextIsolation: false,  // false if you want to run e2e test with Spectron
+      preload: path.join(__dirname, '..', 'preload' ,'preload.js'),
+      nodeIntegration: false,
+      allowRunningInsecureContent: false,
+      contextIsolation: true, // false if you want to run e2e test with Spectron
     },
   });
 
@@ -34,7 +33,7 @@ function createWindow(): BrowserWindow {
     let pathIndex = './index.html';
 
     if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-       // Path when running electron in local folder
+      // Path when running electron in local folder
       pathIndex = '../dist/index.html';
     }
 
@@ -58,7 +57,15 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+  app.whenReady().then(() => {
+    console.log("Starting Electron...");
+    console.log("Electron version: ",process.versions.electron);
+    console.log("Node version: ",process.versions.node);
+    console.log("Chrome version: ",process.versions.chrome);
+    
+    addIpcHandlers();
+    setTimeout(createWindow, 400);
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -76,7 +83,6 @@ try {
       createWindow();
     }
   });
-
 } catch (e) {
   // Catch Error
   // throw e;

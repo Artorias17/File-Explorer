@@ -7,6 +7,7 @@
     "experimentalDecorators": true,
     "module": "commonjs",
     "target": "es2015",
+    "outDir": "app/dist",
     "types": [
       "node"
     ],
@@ -17,8 +18,9 @@
       "dom"
     ]
   },
-  "files": [
-    "app/main.ts"
+  "include": [
+    "app/src/**/*.ts",
+    "./global.d.ts"
   ],
   "exclude": [
     "node_modules",

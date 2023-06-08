@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-layout',
@@ -6,5 +6,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./layout.component.scss']
 })
 export class LayoutComponent {
+  @Input()
+  locations: OSLocation[] = []
 
+  @Output()
+  navigationChanged = new EventEmitter<string>();
+
+  onNavigationChange(path: string) {
+    this.navigationChanged.emit(`${path}`);
+  }
 }

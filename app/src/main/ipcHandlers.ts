@@ -16,8 +16,10 @@ import {
   mergeMap,
   mergeAll,
 } from 'rxjs';
+import { getDriveList } from './windowsDriveList';
 
 const readDir = bindNodeCallback(fs.readdir);
+const fsStat = bindNodeCallback(fs.stat);
 
 const formatSize = (size: number) => {
   let i = Math.floor(Math.log(size) / Math.log(1024));
@@ -32,23 +34,30 @@ const getFilesAndFoldersInDir = async (currentPath: string) => {
       withFileTypes: true,
     }).pipe(
       concatAll(),
-      map((fileOrFolder) => {
-        const filePath = path.join(currentPath, fileOrFolder.name);
-        const stats = fs.statSync(filePath);
-        return {
-          name: fileOrFolder.name,
-          isDirectory: stats.isDirectory(),
-          size: stats.isFile() ? formatSize(stats.size) : null,
-          lastModified: stats.mtime,
-          path: filePath,
-        } as FileOrFolder;
-      }),
       concatMap((fileOrFolder) => {
-        if (!fileOrFolder.isDirectory) return of({ fileOrFolder, ok: true });
-        return readDir(fileOrFolder.path, { withFileTypes: true }).pipe(
-          map(() => ({ fileOrFolder, ok: true })),
-          catchError(() => {
-            return of({ fileOrFolder, ok: false });
+        const filePath = path.join(currentPath, fileOrFolder.name);
+        return fsStat(filePath, { bigint: false }).pipe(
+          map((stat) => {
+            return {
+              name: fileOrFolder.name,
+              isDirectory: stat.isDirectory(),
+              size: stat.isFile() ? formatSize(stat.size as number) : null,
+              lastModified: stat.mtime,
+              path: filePath,
+            } as FileOrFolder;
+          }),
+          catchError(() => of({} as FileOrFolder)),
+          filter((fileOrFolder) => !!fileOrFolder.name),
+          concatMap((fileOrFolder) => {
+            if (!fileOrFolder.isDirectory) {
+              return of({ fileOrFolder, ok: true });
+            }
+            return readDir(fileOrFolder.path, { withFileTypes: true }).pipe(
+              map(() => ({ fileOrFolder, ok: true })),
+              catchError(() => {
+                return of({ fileOrFolder, ok: false });
+              })
+            );
           })
         );
       }),
@@ -67,17 +76,19 @@ const getFilesAndFoldersInDir = async (currentPath: string) => {
       })
     );
 
-    return {
+    const result = {
       currentPath,
       filesAndFolders: await lastValueFrom(filesAndFolders),
     } as Payload;
+    return result;
   } catch (err) {
-    console.error('Outer', err);
+    console.error(err);
     return null;
   }
 };
 
 export function addIpcHandlers() {
+  ipcMain.handle('drives', async () => await getDriveList());
   ipcMain.handle('desktop', () => os.homedir());
   ipcMain.handle('dir', async (event, directory) =>
     getFilesAndFoldersInDir(directory)

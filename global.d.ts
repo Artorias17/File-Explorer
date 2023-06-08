@@ -10,3 +10,9 @@ interface Payload {
   currentPath: string;
   filesAndFolders: FileOrFolder[];
 }
+
+interface OSDrive{
+  name: string;
+  description: string;
+  volumeName: string;
+}

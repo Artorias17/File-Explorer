@@ -15,7 +15,9 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 const rxjs_1 = require("rxjs");
+const windowsDriveList_1 = require("./windowsDriveList");
 const readDir = (0, rxjs_1.bindNodeCallback)(fs.readdir);
+const fsStat = (0, rxjs_1.bindNodeCallback)(fs.stat);
 const formatSize = (size) => {
     let i = Math.floor(Math.log(size) / Math.log(1024));
     const sizeSuffix = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -26,21 +28,23 @@ const getFilesAndFoldersInDir = (currentPath) => __awaiter(void 0, void 0, void 
     try {
         const filesAndFolders = readDir(currentPath, {
             withFileTypes: true,
-        }).pipe((0, rxjs_1.concatAll)(), (0, rxjs_1.map)((fileOrFolder) => {
+        }).pipe((0, rxjs_1.concatAll)(), (0, rxjs_1.concatMap)((fileOrFolder) => {
             const filePath = path.join(currentPath, fileOrFolder.name);
-            const stats = fs.statSync(filePath);
-            return {
-                name: fileOrFolder.name,
-                isDirectory: stats.isDirectory(),
-                size: stats.isFile() ? formatSize(stats.size) : null,
-                lastModified: stats.mtime,
-                path: filePath,
-            };
-        }), (0, rxjs_1.concatMap)((fileOrFolder) => {
-            if (!fileOrFolder.isDirectory)
-                return (0, rxjs_1.of)({ fileOrFolder, ok: true });
-            return readDir(fileOrFolder.path, { withFileTypes: true }).pipe((0, rxjs_1.map)(() => ({ fileOrFolder, ok: true })), (0, rxjs_1.catchError)(() => {
-                return (0, rxjs_1.of)({ fileOrFolder, ok: false });
+            return fsStat(filePath, { bigint: false }).pipe((0, rxjs_1.map)((stat) => {
+                return {
+                    name: fileOrFolder.name,
+                    isDirectory: stat.isDirectory(),
+                    size: stat.isFile() ? formatSize(stat.size) : null,
+                    lastModified: stat.mtime,
+                    path: filePath,
+                };
+            }), (0, rxjs_1.catchError)(() => (0, rxjs_1.of)({})), (0, rxjs_1.filter)((fileOrFolder) => !!fileOrFolder.name), (0, rxjs_1.concatMap)((fileOrFolder) => {
+                if (!fileOrFolder.isDirectory) {
+                    return (0, rxjs_1.of)({ fileOrFolder, ok: true });
+                }
+                return readDir(fileOrFolder.path, { withFileTypes: true }).pipe((0, rxjs_1.map)(() => ({ fileOrFolder, ok: true })), (0, rxjs_1.catchError)(() => {
+                    return (0, rxjs_1.of)({ fileOrFolder, ok: false });
+                }));
             }));
         }), (0, rxjs_1.filter)((items) => items.ok), (0, rxjs_1.map)((item) => item.fileOrFolder), (0, rxjs_1.toArray)(), (0, rxjs_1.map)((filesAndFolders) => {
             return filesAndFolders.sort((a, b) => {
@@ -52,17 +56,19 @@ const getFilesAndFoldersInDir = (currentPath) => __awaiter(void 0, void 0, void 
                         : 1;
             });
         }));
-        return {
+        const result = {
             currentPath,
             filesAndFolders: yield (0, rxjs_1.lastValueFrom)(filesAndFolders),
         };
+        return result;
     }
     catch (err) {
-        console.error('Outer', err);
+        console.error(err);
         return null;
     }
 });
 function addIpcHandlers() {
+    electron_1.ipcMain.handle('drives', () => __awaiter(this, void 0, void 0, function* () { return yield (0, windowsDriveList_1.getDriveList)(); }));
     electron_1.ipcMain.handle('desktop', () => os.homedir());
     electron_1.ipcMain.handle('dir', (event, directory) => __awaiter(this, void 0, void 0, function* () { return getFilesAndFoldersInDir(directory); }));
     electron_1.ipcMain.handle('searchDir', (event, directory, searchTerm) => __awaiter(this, void 0, void 0, function* () {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../core/services';
 import { Observable, filter, map } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-explorer',
@@ -14,7 +15,10 @@ export class ExplorerComponent implements OnInit {
   folders: FileOrFolder[] = [];
   files: FileOrFolder[] = [];
 
-  constructor(private electronService: ElectronService) {}
+  constructor(
+    private electronService: ElectronService,
+    private route: ActivatedRoute
+  ) {}
 
   assignValues(
     observable: Observable<Payload | null>,
@@ -51,7 +55,16 @@ export class ExplorerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.assignValues(this.electronService.goToHome());
+    this.route.queryParamMap.subscribe(paramMap => {
+      this.currentDirectory = paramMap.get('location') || '';
+      console.log("Here...", this.currentDirectory)
+      this.currentDirectory
+      ? this.assignValues(
+          this.electronService.goToDirectory(this.currentDirectory)
+        )
+      : this.assignValues(this.electronService.goToHome());
+    })
+    
   }
 
   onDoubleClickDir(path: string) {
@@ -78,7 +91,6 @@ export class ExplorerComponent implements OnInit {
   }
 
   onSearch(value: string) {
-    console.log(value)
     this.electronService
       .searchDir(this.currentDirectory, value)
       .pipe(filter((payload): payload is Payload => !!payload))

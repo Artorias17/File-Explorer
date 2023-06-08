@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { concatMap, from, of } from 'rxjs';
+import { Observable, concatMap, from, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +12,13 @@ export class ElectronService {
 
   get isElectron() {
     return !!this.electronApi;
+  }
+
+  getHomeDir(): Observable<string | null> {
+    if (this.isElectron && this.electronApi?.getHomeDir) {
+      return from(this.electronApi.getHomeDir());
+    }
+    return of(null);
   }
 
   goToHome() {
@@ -32,8 +39,14 @@ export class ElectronService {
 
   searchDir(directory: string, searchTerm: string) {
     if (this.isElectron && this.electronApi?.searchDir) {
-      console.log(searchTerm);
       return from(this.electronApi.searchDir(directory ,searchTerm));
+    }
+    return of(null);
+  }
+
+  getDrives() {
+    if (this.isElectron && this.electronApi?.searchDir) {
+      return from(this.electronApi.getDrives());
     }
     return of(null);
   }

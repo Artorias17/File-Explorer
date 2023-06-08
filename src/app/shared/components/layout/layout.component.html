@@ -5,12 +5,14 @@
 </mat-toolbar>
 <mat-sidenav-container>
     <mat-sidenav mode="side" opened class="w-56">
-        <mat-list>
-            <a class="cursor-pointer" mat-list-item routerLink="/" mat-ripple routerLinkActive="router-active-link">
-                <mat-icon matListItemIcon>home</mat-icon>
-                <div matListItemTitle>Home</div>
-            </a>
-        </mat-list>
+        <mat-action-list>
+            <ng-container *ngFor="let location of locations">
+                <button (click)="onNavigationChange(location.path)" class="cursor-pointer" mat-list-item mat-ripple>
+                    <mat-icon matListItemIcon>{{ location.icon }}</mat-icon>
+                    <div matListItemTitle>{{ location.name }}</div>
+                </button>
+            </ng-container>
+        </mat-action-list>
     </mat-sidenav>
     <mat-sidenav-content class="p-10">
         <router-outlet></router-outlet>

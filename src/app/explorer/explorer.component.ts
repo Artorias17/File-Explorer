@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../core/services';
 import { Observable, filter, map } from 'rxjs';
 

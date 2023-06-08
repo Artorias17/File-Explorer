@@ -13,7 +13,8 @@
   ],
   "include": [
     "**/*.spec.ts",
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "../global.d.ts"
   ],
   "exclude": [
     "dist",

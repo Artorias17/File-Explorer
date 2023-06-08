@@ -4,12 +4,12 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { PageNotFoundComponent } from './components';
-import { WebviewDirective } from './directives/';
 import { FormsModule } from '@angular/forms';
 import { LayoutComponent } from './components';
 import { MaterialModule } from '../material/material.module';
 import { RouterModule } from '@angular/router';
 import { SearchComponent } from './components';
+import { WebviewDirective } from './directives/webview.directive';
 
 @NgModule({
   declarations: [

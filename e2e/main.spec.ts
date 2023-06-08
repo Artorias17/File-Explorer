@@ -1,14 +1,14 @@
 import { BrowserContext, ElectronApplication, Page, _electron as electron } from 'playwright';
 import { test, expect } from '@playwright/test';
-const PATH = require('path');
+import * as PATH from 'path';
 
-test.describe('Check Home Page', async () => {
+test.describe('Check Explorer Page', async () => {
   let app: ElectronApplication;
   let firstWindow: Page;
   let context: BrowserContext;
 
   test.beforeAll( async () => {
-    app = await electron.launch({ args: [PATH.join(__dirname, '../app/main.js'), PATH.join(__dirname, '../app/package.json')] });
+    app = await electron.launch({ args: [PATH.join(__dirname, '../app/dist/main/main.js'), PATH.join(__dirname, '../app/package.json')] });
     context = app.context();
     await context.tracing.start({ screenshots: true, snapshots: true });
     firstWindow = await app.firstWindow();
@@ -47,9 +47,9 @@ test.describe('Check Home Page', async () => {
   // });
 
   test('Check title', async () => {
-    const elem = await firstWindow.$('app-home h1');
-    const text = await elem.innerText();
-    expect(text).toBe('App works !');
+    const elem = await firstWindow.$('app-layout > mat-toolbar > mat-toolbar-row > span');
+    const text = await elem?.innerText();
+    expect(text).toBe('File Explorer');
   });
 
   test.afterAll( async () => {

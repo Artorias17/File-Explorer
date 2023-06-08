@@ -10,7 +10,5 @@ interface ElectronApi {
 }
 
 interface Window {
-  process: any;
-  require: any;
   electronApi: ElectronApi;
 }

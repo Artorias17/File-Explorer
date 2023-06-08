@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ElectronService } from '../core/services';
 import { Observable, filter, map } from 'rxjs';
 
@@ -7,10 +7,10 @@ import { Observable, filter, map } from 'rxjs';
   templateUrl: './explorer.component.html',
   styleUrls: ['./explorer.component.scss'],
 })
-export class ExplorerComponent {
-  currentDirectory: string = '';
+export class ExplorerComponent implements OnInit {
+  currentDirectory = '';
   directoryHistroy: string[] = [];
-  directoryHistoryIndex: number = -1;
+  directoryHistoryIndex = -1;
   folders: FileOrFolder[] = [];
   files: FileOrFolder[] = [];
 

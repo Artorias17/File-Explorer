@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
@@ -6,10 +6,10 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']
 })
-export class SearchComponent {
-  @Input() placeholder: string = "";
-  @Input() label: string = "";
-  @Input() searchTerm: string = "";
+export class SearchComponent implements OnInit {
+  @Input() placeholder = "";
+  @Input() label = "";
+  @Input() searchTerm = "";
   @Output() searchTermChange = new EventEmitter<string>();
   searchTermSubject = new Subject<string>();
 

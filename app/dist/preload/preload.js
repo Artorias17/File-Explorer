@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const electron_1 = require("electron");
 electron_1.contextBridge.exposeInMainWorld("electronApi", {
-    goToDesktop: () => __awaiter(void 0, void 0, void 0, function* () { return yield electron_1.ipcRenderer.invoke("desktop"); }),
+    getHomeDir: () => __awaiter(void 0, void 0, void 0, function* () { return yield electron_1.ipcRenderer.invoke("desktop"); }),
     goToDir: (path) => __awaiter(void 0, void 0, void 0, function* () { return yield electron_1.ipcRenderer.invoke("dir", path); }),
+    searchDir: (directory, searchTerm) => __awaiter(void 0, void 0, void 0, function* () { return yield electron_1.ipcRenderer.invoke("searchDir", directory, searchTerm); }),
 });
 //# sourceMappingURL=preload.js.map

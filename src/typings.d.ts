@@ -5,8 +5,9 @@ interface NodeModule {
 }
 
 interface ElectronApi {
-  goToDesktop: () => Promise<Payload | null>;
+  getHomeDir: () => Promise<string>;
   goToDir: (path: string) => Promise<Payload | null>;
+  searchDir: (directory: string ,searchTerm: string) => Promise<Payload | null>;
 }
 
 interface Window {

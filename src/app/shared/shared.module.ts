@@ -2,14 +2,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { TranslateModule } from '@ngx-translate/core';
-
-import { PageNotFoundComponent } from './components';
-import { FormsModule } from '@angular/forms';
-import { LayoutComponent } from './components';
-import { MaterialModule } from '../material/material.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { SearchComponent } from './components';
+import { MaterialModule } from '../material/material.module';
+import { LayoutComponent } from './components/layout/layout.component';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { SearchComponent } from './components/search/search.component';
 import { WebviewDirective } from './directives/webview.directive';
+
 
 @NgModule({
   declarations: [
@@ -24,6 +24,7 @@ import { WebviewDirective } from './directives/webview.directive';
     FormsModule,
     MaterialModule,
     RouterModule,
+    ReactiveFormsModule
   ],
   exports: [
     TranslateModule,

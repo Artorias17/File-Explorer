@@ -11,7 +11,7 @@
       <div class="flex-grow my-auto">
         <h3>{{ currentDirectory }}</h3>
       </div>
-      <app-search label="Search" class="w-96"></app-search>
+      <app-search label="Search" (searchTermChange)="onSearch($event)" class="w-96"></app-search>
     </div>
     <mat-divider />
     <div class="overflow-y-auto flex-grow mt-5">

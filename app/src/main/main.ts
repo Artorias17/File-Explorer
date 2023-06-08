@@ -12,8 +12,9 @@ function createWindow(): BrowserWindow {
 
   // Create the browser window.
   win = new BrowserWindow({
-    width: size.width,
-    height: size.height,
+    width: size.width * 0.75,
+    height: size.height * 0.75,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload' ,'preload.js'),
       nodeIntegration: false,
@@ -32,14 +33,23 @@ function createWindow(): BrowserWindow {
     // Path when running electron executable
     let pathIndex = './index.html';
 
-    if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
+    if (fs.existsSync(path.join(__dirname,'../../../dist/index.html'))) {
       // Path when running electron in local folder
-      pathIndex = '../dist/index.html';
+      pathIndex = '../../../dist/index.html';
     }
 
     const url = new URL(path.join('file:', __dirname, pathIndex));
     win.loadURL(url.href);
   }
+
+  win.once('ready-to-show', () => {
+    if (win) {
+      const winSize = win.getSize();
+      win.setContentSize(winSize[0], winSize[1]);
+      win.show();
+    }
+  })
+
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -56,7 +66,7 @@ try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
+  // Added 500 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.whenReady().then(() => {
     console.log("Starting Electron...");
     console.log("Electron version: ",process.versions.electron);
@@ -64,7 +74,7 @@ try {
     console.log("Chrome version: ",process.versions.chrome);
     
     addIpcHandlers();
-    setTimeout(createWindow, 400);
+    setTimeout(createWindow, 500);
   });
 
   // Quit when all windows are closed.

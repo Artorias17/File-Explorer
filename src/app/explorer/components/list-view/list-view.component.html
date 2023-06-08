@@ -1,21 +1,28 @@
 <mat-action-list>
     <ng-container *ngIf="!!folders.length">
         <div mat-subheader>Folders ({{ folders.length }})</div>
-        <mat-divider />
-        <button mat-list-item *ngFor="let folder of folders" (dblclick)="onItemClicked(folder.path)">
-          <mat-icon matListItemIcon color="accent">folder</mat-icon>
-          <div matListItemTitle>{{ folder.name }}</div>
-          <div matListItemLine>{{ folder.lastModified | date:'full' }}</div>
-        </button>
+        <ng-container *ngFor="let folder of folders">
+          <mat-divider />
+          <button mat-list-item (dblclick)="onItemClicked(folder.path)">
+            <mat-icon matListItemIcon color="accent">folder</mat-icon>
+            <div matListItemTitle>{{ folder.name }}</div>
+            <div matListItemLine>{{ folder.lastModified | date:'full' }}</div>
+            <div matListItemLine>{{ folder.path }}</div>
+          </button>
+        </ng-container>
     </ng-container>
     <ng-container *ngIf="!!files.length">
         <div mat-subheader>Files ({{ files.length }})</div>
-        <mat-divider />
-        <button mat-list-item *ngFor="let file of files">
-          <mat-icon matListItemIcon color="accent">insert_drive_file</mat-icon>
-          <div matListItemTitle>{{ file.name }}</div>
-          <div matListItemLine>{{ file.size }}</div>
-          <div matListItemLine>{{ file.lastModified | date:'full' }}</div>
-        </button>
+        <ng-container *ngFor="let file of files">
+          <mat-divider/>
+          <button mat-list-item >
+            <mat-icon matListItemIcon color="accent">insert_drive_file</mat-icon>
+            <div matListItemTitle>{{ file.name }}</div>
+            <div matListItemLine>{{ file.size }}</div>
+            <div matListItemLine>{{ file.lastModified | date:'full' }}</div>
+            <div matListItemLine>{{ file.path }}</div>
+          </button>
+        </ng-container>
+        
     </ng-container>
   </mat-action-list>

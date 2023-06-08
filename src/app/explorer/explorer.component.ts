@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ElectronService } from '../core/services';
 import { Observable, filter, map } from 'rxjs';
 
@@ -75,5 +75,20 @@ export class ExplorerComponent implements OnInit {
       ),
       1
     );
+  }
+
+  onSearch(value: string) {
+    console.log(value)
+    this.electronService
+      .searchDir(this.currentDirectory, value)
+      .pipe(filter((payload): payload is Payload => !!payload))
+      .subscribe((payload) => {
+        this.folders = payload.filesAndFolders.filter(
+          (item) => item.isDirectory
+        );
+        this.files = payload.filesAndFolders.filter(
+          (item) => !item.isDirectory
+        );
+      });
   }
 }

@@ -16,7 +16,7 @@ import {
   mergeMap,
   mergeAll,
 } from 'rxjs';
-import { getDriveList } from './windowsDriveList';
+import { getDriveList } from './windows-drive-list';
 
 const readDir = bindNodeCallback(fs.readdir);
 const fsStat = bindNodeCallback(fs.stat);
@@ -95,17 +95,26 @@ export function addIpcHandlers() {
   );
   ipcMain.handle('searchDir', async (event, directory, searchTerm) => {
     if (!searchTerm) return null;
+
+    //Really really slow.
     const recursiveSearch = async (dir: string, search: string) => {
       let filesAndFolders =
         (await getFilesAndFoldersInDir(dir))?.filesAndFolders || [];
-      let folders = filesAndFolders.filter(
+
+      const folders = filesAndFolders.filter(
         (f) => f.isDirectory && f.name.includes(search)
       );
 
-      const innerFilesAndFolders = from(folders).pipe(
+      const files = filesAndFolders.filter(
+        (f) => !f.isDirectory && f.name.includes(search)
+      );
+
+      const innerFilesAndFolders = from(filesAndFolders).pipe(
+        filter((f) => f.isDirectory),
         mergeMap((folder) => {
+          console.log(folder.path);
           return from(recursiveSearch(folder.path, search));
-        }, folders.length || 1),
+        }, filesAndFolders.filter((f) => f.isDirectory).length || 1),
         mergeAll(),
         toArray()
       );
@@ -113,20 +122,20 @@ export function addIpcHandlers() {
       const innerFolders: FileOrFolder[] =
         (await lastValueFrom(innerFilesAndFolders)) || [];
 
-      innerFolders.sort((a, b) => {
-        return a.isDirectory === b.isDirectory ||
-          !a.isDirectory === !b.isDirectory
-          ? a.path.localeCompare(b.path)
-          : a.isDirectory
-          ? -1
-          : 1;
-      });
-      return [...folders, ...innerFolders] as FileOrFolder[];
+      return [...folders, ...files, ...innerFolders] as FileOrFolder[];
     };
+
+    //For recursively search directories and files uncomment the following line.
+    // const filesAndFolders = await recursiveSearch(directory, searchTerm)
+
+    // For searching files and folders at the top level only.
+    const filesAndFolders = (
+      (await getFilesAndFoldersInDir(directory))?.filesAndFolders || []
+    ).filter((f) => f.name.includes(searchTerm));
 
     return {
       currentPath: directory,
-      filesAndFolders: await recursiveSearch(directory, searchTerm),
+      filesAndFolders,
     } as Payload;
   });
 }

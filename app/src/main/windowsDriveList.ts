@@ -3,7 +3,6 @@ import {
   Observable,
   catchError,
   concatAll,
-  concatMap,
   filter,
   lastValueFrom,
   map,
@@ -55,6 +54,7 @@ export async function getDriveList() {
 function runWMIC(args: string[]) {
   const observable = new Observable<string[]>((subscriber) => {
     const cmd = spawn('wmic', args);
+
     cmd.stdout.once('data', (chunk) => {
       let data = String(chunk);
       let formattedData = data
@@ -67,11 +67,23 @@ function runWMIC(args: string[]) {
         formattedData.push('');
       }
       subscriber.next(formattedData);
-      cmd.kill();
+      cmd.kill('SIGINT');
     });
 
-    cmd.stderr.once('data', errorCallback(subscriber));
-    cmd.once('exit', exitCallback(subscriber, ['wmic', ...args].join(' ')));
+    cmd.stderr.once('data', (data) => {
+      subscriber.error(String(data));
+      cmd.kill('SIGINT');
+    });
+
+    cmd.once('exit',  (code, signal) => {
+      console.log('Child Process: ', ['wmic', ...args].join(' '));
+      console.log('Exited with code', code);
+      console.log('Received termination signal', signal);
+      subscriber.complete();
+    });
+
+    process.once('SIGINT', () => cmd.kill('SIGINT'));
+
   }).pipe(
     catchError((err) => {
       console.error('Error occurred while running wmic with args', args);
@@ -81,20 +93,4 @@ function runWMIC(args: string[]) {
   );
 
   return observable;
-}
-
-function exitCallback(
-  subscriber: any,
-  command: string
-): (code: number | null, signal: NodeJS.Signals | null) => void {
-  return (code, signal) => {
-    console.log('Child Process: ', command);
-    console.log('Exited with code', code);
-    console.log('Received termination signal', signal);
-    subscriber.complete();
-  };
-}
-
-function errorCallback(subscriber: any): (chunk: any) => void {
-  return (data) => subscriber.error(String(data));
 }

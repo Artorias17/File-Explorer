@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ExplorerComponent implements OnInit {
   currentDirectory = '';
+  loading = false;
   directoryHistroy: string[] = [];
   directoryHistoryIndex = -1;
   folders: FileOrFolder[] = [];
@@ -24,6 +25,7 @@ export class ExplorerComponent implements OnInit {
     observable: Observable<Payload | null>,
     moveHistoryIndexByUnit: -1 | 0 | 1 = 0
   ) {
+    this.loading = true;
     observable
       .pipe(
         filter((payload): payload is Payload => !!payload),
@@ -32,32 +34,34 @@ export class ExplorerComponent implements OnInit {
           return payload;
         })
       )
-      .subscribe((content) => {
-        this.folders = content.filesAndFolders.filter(
-          (item) => item.isDirectory
-        );
-        this.files = content.filesAndFolders.filter(
-          (item) => !item.isDirectory
-        );
-        this.currentDirectory = content.currentPath;
-        if (moveHistoryIndexByUnit == 0) {
-          this.directoryHistroy = this.directoryHistroy.slice(
-            0,
-            this.directoryHistoryIndex + 1
+      .subscribe({
+        next: (content) => {
+          this.folders = content.filesAndFolders.filter(
+            (item) => item.isDirectory
           );
-          this.directoryHistroy.push(this.currentDirectory);
-          if (this.directoryHistroy.length > 10) {
-            this.directoryHistroy.splice(0, 1);
+          this.files = content.filesAndFolders.filter(
+            (item) => !item.isDirectory
+          );
+          this.currentDirectory = content.currentPath;
+          if (moveHistoryIndexByUnit == 0) {
+            this.directoryHistroy = this.directoryHistroy.slice(
+              0,
+              this.directoryHistoryIndex + 1
+            );
+            this.directoryHistroy.push(this.currentDirectory);
+            if (this.directoryHistroy.length > 10) {
+              this.directoryHistroy.splice(0, 1);
+            }
+            this.directoryHistoryIndex = this.directoryHistroy.length - 1;
           }
-          this.directoryHistoryIndex = this.directoryHistroy.length - 1;
-        }
+        },
+        complete: () => this.loading = false,
       });
   }
 
   ngOnInit() {
     this.route.queryParamMap.subscribe(paramMap => {
       this.currentDirectory = paramMap.get('location') || '';
-      console.log("Here...", this.currentDirectory)
       this.currentDirectory
       ? this.assignValues(
           this.electronService.goToDirectory(this.currentDirectory)
@@ -91,10 +95,12 @@ export class ExplorerComponent implements OnInit {
   }
 
   onSearch(value: string) {
+    this.loading = true;
     this.electronService
       .searchDir(this.currentDirectory, value)
       .pipe(filter((payload): payload is Payload => !!payload))
       .subscribe((payload) => {
+        this.loading = false;
         this.folders = payload.filesAndFolders.filter(
           (item) => item.isDirectory
         );

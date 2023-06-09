@@ -1,20 +1,22 @@
 <div class="flex flex-col h-full gap-1">
-    <div class="flex-none flex items-center gap-4">
-      <div class="flex-none flex gap-4 mb-4">
-        <button mat-mini-fab (click)="onGoBack()" [disabled]="directoryHistoryIndex === 0">
+    <div class="flex-none flex items-start gap-10">
+      <div class="flex-none flex gap-4">
+        <button mat-fab color="primary" (click)="onGoBack()" [disabled]="directoryHistoryIndex === 0">
           <mat-icon>navigate_before</mat-icon>
         </button>
-        <button mat-mini-fab (click)="onGoForward()" [disabled]="directoryHistroy.length === directoryHistoryIndex + 1">
+        <button mat-fab color="primary" (click)="onGoForward()" [disabled]="directoryHistroy.length === directoryHistoryIndex + 1">
           <mat-icon>navigate_next</mat-icon>
         </button>
       </div>
-      <div class="flex-grow my-auto">
-        <h3>{{ currentDirectory }}</h3>
+      <div class="flex-grow h-14">
+        <div><h3 class="py-4">{{ currentDirectory }}</h3></div>
       </div>
-      <app-search label="Search" (searchTermChange)="onSearch($event)" class="w-96"></app-search>
+      <app-search label="Search" (searchTermChange)="onSearch($event)" class="w-80"></app-search>
     </div>
-    <mat-divider />
-    <div class="overflow-y-auto flex-grow mt-5">
+    <div class="h-2 flex-none">
+      <mat-progress-bar color="primary" [mode]="loading ? 'indeterminate' : 'determinate' " value="100" class="my-auto"/>
+    </div>
+    <div class="overflow-y-auto flex-grow">
       <app-list-view [folders]="folders" [files]="files" (itemClickEvent)="onDoubleClickDir($event)"/>
     </div>
   </div>

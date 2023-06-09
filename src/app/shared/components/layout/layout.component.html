@@ -4,13 +4,16 @@
     </mat-toolbar-row>
 </mat-toolbar>
 <mat-sidenav-container>
-    <mat-sidenav mode="side" opened class="w-56">
+    <mat-sidenav mode="side" opened class="w-64">
         <mat-action-list>
-            <ng-container *ngFor="let location of locations">
+            <ng-container *ngFor="let location of locations; last as isLast">
                 <button (click)="onNavigationChange(location.path)" class="cursor-pointer" mat-list-item mat-ripple>
                     <mat-icon matListItemIcon>{{ location.icon }}</mat-icon>
-                    <div matListItemTitle>{{ location.name }}</div>
+                    <div matListItemTitle *ngIf="location.name">{{ location.name }}</div>
+                    <div matListItemLine *ngIf="location.volumeName">{{ location.volumeName }}</div>
+                    <div matListItemLine *ngIf="location.description">{{ location.description }}</div>
                 </button>
+                <mat-divider *ngIf="!isLast"/>
             </ng-container>
         </mat-action-list>
     </mat-sidenav>

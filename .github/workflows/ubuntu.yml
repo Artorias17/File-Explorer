@@ -57,12 +57,12 @@ jobs:
       run: npm run lint
 
     - name: Run headless unit test
-      uses: GabrielBB/xvfb-action@v1
+      uses: coactions/setup-xvfb@v1
       with:
         run: npm run test
 
     - name: Run headless e2e test
-      uses: GabrielBB/xvfb-action@v1
+      uses: coactions/setup-xvfb@v1
       with:
         run: npm run e2e
 

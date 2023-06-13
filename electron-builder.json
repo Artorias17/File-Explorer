@@ -4,13 +4,11 @@
     "output": "release/"
   },
   "files": [
-    "**/*",
-    "!**/*.ts",
-    "!*.map",
-    "!package.json",
-    "!package-lock.json",
+    "dist/**/*",
+    "!dist/**/*.map",
     {
       "from": "../dist",
+      "to": "dist/renderer",
       "filter": ["**/*"]
     }
   ],

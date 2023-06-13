@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, Menu } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { addIpcHandlers } from './ipc-handlers';
@@ -16,12 +16,17 @@ function createWindow(): BrowserWindow {
     height: size.height * 0.75,
     show: false,
     webPreferences: {
-      preload: path.join(__dirname, '..', 'preload' ,'preload.js'),
+      preload: path.normalize(path.join(__dirname, '../preload/preload.js')),
       nodeIntegration: false,
       allowRunningInsecureContent: false,
       contextIsolation: true, // false if you want to run e2e test with Spectron
+      devTools: serve, // remove devtools from production builds
     },
   });
+
+  // remove defualt menu
+  // TODO: Add new menu items
+  Menu.setApplicationMenu(null);
 
   if (serve) {
     const debug = require('electron-debug');
@@ -29,17 +34,25 @@ function createWindow(): BrowserWindow {
 
     require('electron-reloader')(module);
     win.loadURL('http://localhost:4200');
+    win.webContents.openDevTools();
   } else {
     // Path when running electron executable
-    let pathIndex = './index.html';
+    let pathIndex = path.normalize(
+      path.join(__dirname, '../../dist/renderer/index.html')
+    );
 
-    if (fs.existsSync(path.join(__dirname,'../../../dist/index.html'))) {
+    if (
+      fs.existsSync(
+        path.normalize(path.join(__dirname, '../../../dist/index.html'))
+      )
+    ) {
       // Path when running electron in local folder
-      pathIndex = '../../../dist/index.html';
+      pathIndex = path.normalize(
+        path.join(__dirname, '../../../dist/index.html')
+      );
     }
 
-    const url = new URL(path.join('file:', __dirname, pathIndex));
-    win.loadURL(url.href);
+    win.loadFile(pathIndex);
   }
 
   win.once('ready-to-show', () => {
@@ -48,8 +61,7 @@ function createWindow(): BrowserWindow {
       win.setContentSize(winSize[0], winSize[1]);
       win.show();
     }
-  })
-
+  });
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -68,11 +80,11 @@ try {
   // Some APIs can only be used after this event occurs.
   // Added 500 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.whenReady().then(() => {
-    console.log("Starting Electron...");
-    console.log("Electron version: ",process.versions.electron);
-    console.log("Node version: ",process.versions.node);
-    console.log("Chrome version: ",process.versions.chrome);
-    
+    console.log('Starting Electron...');
+    console.log('Electron version: ', process.versions.electron);
+    console.log('Node version: ', process.versions.node);
+    console.log('Chrome version: ', process.versions.chrome);
+
     addIpcHandlers();
     setTimeout(createWindow, 500);
   });

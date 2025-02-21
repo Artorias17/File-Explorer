@@ -1,0 +1,47 @@
+{
+  "name": "Node.js & TypeScript",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:18-bookworm",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/angular-cli:2": {
+      "version": "16.0.5"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": [
+        "angular.ng-template",
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+        "davidanson.vscode-markdownlint",
+        "dbaeumer.vscode-eslint",
+        "dotjoshjohnson.xml",
+        "eamodio.gitlens",
+        "ecmel.vscode-html-css",
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "formulahendry.auto-complete-tag",
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-github-actions",
+        "mechatroner.rainbow-csv",
+        "ms-vscode.vscode-typescript-next",
+        "ms-vsliveshare.vsliveshare",
+        "nhoizey.gremlins",
+        "pkief.material-icon-theme",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
+        "ritwickdey.liveserver",
+        "tomoki1207.pdf",
+        "visualstudioexptteam.intellicode-api-usage-examples",
+        "visualstudioexptteam.vscodeintellicode",
+        "voldemortensen.rainbow-tags",
+        "wholroyd.jinja"
+      ]
+    }
+  },
+  "postCreateCommand": "npm i",
+  "remoteUser": "node"
+}

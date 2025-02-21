@@ -2,8 +2,7 @@
   "name": "file-explorer",
   "version": "1.0.0",
   "author": {
-    "name": "Abhishek Roy",
-    "email": "abhishek.roy@enosisbd.com"
+    "name": "Abhishek Roy"
   },
   "main": "app/dist/main/main.js",
   "private": true,

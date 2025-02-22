@@ -7,7 +7,6 @@
   "main": "app/dist/main/main.js",
   "private": true,
   "scripts": {
-    "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "npm-run-all -p electron:serve ng:serve",
     "ng:serve": "ng serve -c web",
@@ -20,6 +19,10 @@
     "electron:serve": "wait-on tcp:4200 -l && npm run electron:serve-tsc && electron . --serve",
     "electron:local": "npm run build:prod && electron .",
     "electron:build": "npm run build:prod && electron-builder build --publish=never",
+    "electron:build:win": "npm run build:prod && electron-builder build --windows --publish=never",
+    "electron:build:linux": "npm run build:prod && electron-builder build --linux --publish=never",
+    "electron:build:mac": "npm run build:prod && electron-builder build --mac --publish=never",
+    "postinstall": "electron-builder install-app-deps",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "e2e": "npm run build:prod && playwright test -c e2e/playwright.config.ts e2e/",
@@ -29,7 +32,6 @@
   },
   "dependencies": {
     "@angular-builders/custom-webpack": "16.0.0",
-    "@angular-devkit/build-angular": "16.0.5",
     "@angular/animations": "16.0.4",
     "@angular/cdk": "16.0.3",
     "@angular/common": "16.0.4",

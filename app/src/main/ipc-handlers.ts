@@ -16,7 +16,7 @@ import {
   mergeMap,
   mergeAll,
 } from 'rxjs';
-import { getDriveList } from './windows-drive-list';
+import { getDriveList } from './drive-list';
 
 const readDir = bindNodeCallback(fs.readdir);
 const fsStat = bindNodeCallback(fs.stat);
@@ -70,8 +70,8 @@ const getFilesAndFoldersInDir = async (currentPath: string) => {
             !a.isDirectory === !b.isDirectory
             ? a.name.localeCompare(b.name)
             : a.isDirectory
-            ? -1
-            : 1;
+              ? -1
+              : 1;
         });
       })
     );
